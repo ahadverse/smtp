@@ -55,9 +55,26 @@ const upload = multer({ storage: storage });
 
 router.post("/", upload.single("file"), async (req, res) => {
   const emailList = req.body.emailList;
-  const desc = req.body.desc;
+  let desc = req.body.desc;
   const subject = req.body.subject;
   const users = req.body.users;
+
+  function generateRandomNumber() {
+    const min = 10000000;
+    const max = 99999999;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const randomNumber = generateRandomNumber();
+
+  const changeDesc = (desc, recipient) => {
+    const username = recipient.split("@")[0];
+
+    desc = desc.replace("{username}", `${username}`);
+    desc = desc.replace("{invoice}", `${randomNumber}`);
+
+    return desc;
+  };
 
   let totalSent = 0;
   let totalRejected = 0;
@@ -81,14 +98,6 @@ router.post("/", upload.single("file"), async (req, res) => {
       }
     }
 
-    function generateRandomNumber() {
-      const min = 10000000;
-      const max = 99999999;
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    const randomNumber = generateRandomNumber();
-
     // Function to send a batch of emails
     const sendBatch = async (batch, user) => {
       const transporter = await createTransporter(user);
@@ -99,7 +108,7 @@ router.post("/", upload.single("file"), async (req, res) => {
               from: `${subject} <${user.email}>`,
               to: recipient,
               subject: `${subject} ${randomNumber}`,
-              html: desc,
+              html: changeDesc(desc, recipient),
             };
 
             if (attachmentPath) {

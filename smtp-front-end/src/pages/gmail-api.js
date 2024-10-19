@@ -38,10 +38,10 @@ const GmailApi = () => {
         "http://localhost:5000/api/formultiuser",
         data
       );
-      if (res.data.message == "Emails sent successfully!") {
-        setLoading(false);
-        router.reload();
-      }
+      //if (res.data.message == "Emails sent successfully!") {
+      //  setLoading(false);
+      //  router.reload();
+      //}
       // Handle success if needed
     } catch (error) {
       console.log(error);
